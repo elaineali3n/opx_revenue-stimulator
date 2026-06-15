@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPCardX — Subscription Revenue Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #E11B22; --gold: #C9A84C; --blue: #3B82F6; --green: #10B981;
+      --purple: #8B5CF6; --amber: #F59E0B;
+      --bg: #F4F4F4; --surface: #FFFFFF;
+      --border: #E3E3E3; --border-strong: #D0D0D0;
+      --text: #1A1A1A; --muted: #6B6B6B; --faint: #A8A8A8;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 36px 24px 60px; }
+    .container { max-width: 1180px; margin: 0 auto; }
+
+    /* Header */
+    .header { margin-bottom: 24px; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .badge { background: var(--red); color: #fff; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+    .eyebrow-sub { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .header h1 { font-size: 24px; font-weight: 600; letter-spacing: -.02em; margin-bottom: 4px; }
+    .header p { font-size: 14px; color: var(--muted); }
+
+    /* Top controls */
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 12px; }
+    .period-row { display: flex; gap: 8px; }
+    .period-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--muted); transition: all .15s; }
+    .period-btn:hover { border-color: var(--red); color: var(--red); }
+    .period-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .scenario-controls { display: flex; gap: 8px; align-items: center; }
+    .scenario-input { padding: 6px 12px; border: 1px solid var(--border-strong); border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--text); width: 190px; }
+    .scenario-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+    .btn { padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
+    .btn-primary:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    /* Chips */
+    .scenario-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .scenario-chips:empty { margin-bottom: 0; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid; }
+    .chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .chip-del { background: none; border: none; cursor: pointer; font-size: 15px; line-height: 1; opacity: .55; padding: 0 0 0 2px; }
+    .chip-del:hover { opacity: 1; }
+
+    /* Main layout */
+    .main-grid { display: grid; grid-template-columns: 295px 1fr; gap: 20px; align-items: start; }
+
+    /* Inputs */
+    .input-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: sticky; top: 20px; }
+    .inp-section { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px; }
+    .inp-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    .slider-group { margin-bottom: 14px; }
+    .slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .slider-lbl { font-size: 12px; color: var(--muted); }
+    .slider-val { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .slider-ends { display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); margin-top: 2px; }
+    .hint { font-size: 10px; color: var(--faint); margin-top: 3px; font-style: italic; }
+
+    input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #E5E5E5; outline: none; cursor: pointer; }
+    input[type=range].r-red::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--red); cursor: pointer; box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px var(--red); }
+    input[type=range].r-gold::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--gold); cursor: pointer; box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px var(--gold); }
+    input[type=range].r-blue::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--blue); cursor: pointer; box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px var(--blue); }
+    input[type=range].r-green::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--green); cursor: pointer; box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px var(--green); }
+    input[type=range].r-gray::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); cursor: pointer; box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px var(--muted); }
+    input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
+
+    .tier-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+    .tier-bar div { transition: flex .15s; }
+    .tier-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 11px; font-weight: 600; }
+
+    .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .price-lbl { font-size: 12px; color: var(--muted); }
+    .price-wrap { display: flex; align-items: center; gap: 2px; border: 1px solid var(--border-strong); border-radius: 7px; padding: 5px 9px; }
+    .price-sym { font-size: 12px; color: var(--muted); }
+    .price-input { width: 62px; text-align: right; background: transparent; border: none; font-size: 13px; font-weight: 600; outline: none; color: var(--text); font-variant-numeric: tabular-nums; }
+
+    /* Metric cards */
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+    .mc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; }
+    .mc.t-red   { border-top: 2.5px solid var(--red); }
+    .mc.t-gold  { border-top: 2.5px solid var(--gold); }
+    .mc.t-blue  { border-top: 2.5px solid var(--blue); }
+    .mc.t-green { border-top: 2.5px solid var(--green); }
+    .mc-lbl { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; }
+    .mc-val { font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1.15; }
+    .mc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* Chart */
+    .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .chart-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 12px; }
+    .chart-title { font-size: 14px; font-weight: 600; }
+    .chart-legend { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+    .leg-pip { width: 12px; height: 3px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+
+    /* Table */
+    .table-section { margin-top: 20px; }
+    .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .table-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+    .table-title { font-size: 14px; font-weight: 600; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 740px; }
+    thead tr { background: #FAFAFA; border-bottom: 1px solid var(--border); }
+    th { padding: 10px 14px; font-weight: 600; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; color: var(--muted); }
+    th.l, td.l { text-align: left; }
+    th.r, td.r { text-align: right; }
+    tbody tr { border-bottom: 1px solid #F0F0F0; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F9F9F9; }
+    tbody tr.be-row { background: #FFFBEA; }
+    td { padding: 9px 14px; font-variant-numeric: tabular-nums; color: var(--text); }
+    td.mo-cell { color: var(--muted); font-weight: 600; }
+
+    /* Footer note */
+    .model-note { margin-top: 20px; font-size: 11px; color: var(--faint); line-height: 1.7; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+
+    @media (max-width: 960px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .input-panel { position: static; }
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="eyebrow">
+      <span class="badge">OPCardX</span>
+      <span class="eyebrow-sub">Finance · Subscription Model</span>
+    </div>
+    <h1>Subscription Revenue Simulator</h1>
+    <p>Collector & Trader tier MRR projections — model growth, annual plans, unit economics, and scenarios in one view</p>
+  </div>
+
+  <div class="top-bar">
+    <div class="period-row">
+      <button class="period-btn" id="p6" onclick="setPeriod(6)">6 months</button>
+      <button class="period-btn active" id="p12" onclick="setPeriod(12)">12 months</button>
+      <button class="period-btn" id="p24" onclick="setPeriod(24)">24 months</button>
+      <button class="period-btn" id="p36" onclick="setPeriod(36)">36 months</button>
+    </div>
+    <div class="scenario-controls">
+      <input class="scenario-input" type="text" id="scenario-name" placeholder="Name this scenario…" maxlength="24">
+      <button class="btn btn-primary" onclick="saveScenario()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save scenario
+      </button>
+    </div>
+  </div>
+
+  <div class="scenario-chips" id="scenario-chips"></div>
+
+  <div class="main-grid">
+
+    <!-- INPUTS -->
+    <div class="input-panel">
+
+      <div class="inp-section" style="color:var(--red);">User base</div>
+      <div class="slider-group">
+        <div class="slider-row"><span class="slider-lbl">Starting users</span><span class="slider-val" id="lbl-start">5,000</span></div>
+        <input type="range" class="r-red" id="sl-start" min="500" max="50000" step="500" value="5000" oninput="update()">
+        <div class="slider-ends"><span>500</span><span>50K</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-row"><span class="slider-lbl">Monthly growth</span><span class="slider-val" id="lbl-growth">8%</span></div>
+        <input type="range" class="r-red" id="sl-growth" min="0" max="25" step="0.5" value="8" oninput="update()">
+        <div class="slider-ends"><span>0%</span><span>25%</span></div>
+      </div>
+
+      <div class="inp-divider"></div>
+      <div class="inp-section" style="color:var(--gold);">Conversion</div>
+      <div class="slider-group">
+        <div class="slider-row"><span class="slider-lbl">Free → Paid rate</span><span class="slider-val" id="lbl-conv">12%</span></div>
+        <input type="range" class="r-gold" id="sl-conv" min="0" max="30" step="0.5" value="12" oninput="update()">
+        <div class="slider-ends"><span>0%</span><span>30%</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-row"><span class="slider-lbl">Monthly churn</span><span class="slider-val" id="lbl-churn">3%</span></div>
+        <input type="range" class="r-gold" id="sl-churn" min="0" max="15" step="0.25" value="3" oninput="update()">
+        <div class="slider-ends"><span>0%</span><span>15%</span></div>
+      </div>
+
+      <div class="inp-divider"></div>
+      <div class="inp-section" style="color:var(--muted);">Tier mix & pricing</div>
+      <div class="slider-group">
+        <div class="tier-bar"><div id="bar-coll" style="background:var(--gold);flex:65;"></div><div id="bar-trad" style="background:var(--red);flex:35;"></div></div>
+        <input type="range" class="r-gray" id="sl-coll" min="10" max="90" step="1" value="65" oninput="update()">
+        <div class="tier-labels"><span style="color:var(--gold);">Collector <span id="lbl-coll-pct">65</span>%</span><span style="color:var(--red);">Trader <span id="lbl-trad-pct">35</span>%</span></div>
+      </div>
+      <div class="price-row" style="margin-top:10px;">
+        <span class="price-lbl">Collector / mo</span>
+        <div class="price-wrap"><span class="price-sym">$</span><input class="price-input" type="number" id="in-coll" value="4.99" min="0" max="49.99" step="0.5" oninput="update()"></div>
+      </div>
+      <div class="price-row">
+        <span class="price-lbl">Trader / mo</span>
+        <div class="price-wrap"><span class="price-sym">$</span><input class="price-input" type="number" id="in-trad" value="9.99" min="0" max="99.99" step="0.5" oninput="update()"></div>
+      </div>
+
+      <div class="inp-divider"></div>
+      <div class="inp-section" style="color:var(--blue);">Annual plans</div>
+      <div class="slider-group">
+        <div class="slider-row"><span class="slider-lbl">Annual uptake</span><span class="slider-val" id="lbl-annual-uptake">30%</span></div>
+        <input type="range" class="r-blue" id="sl-annual-uptake" min="0" max="80" step="1" value="30" oninput="update()">
+        <div class="slider-ends"><span>0%</span><span>80%</span></div>
+        <div class="hint">% of paid users on yearly plans</div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-row"><span class="slider-lbl">Annual discount</span><span class="slider-val" id="lbl-annual-discount">17%</span></div>
+        <input type="range" class="r-blue" id="sl-annual-discount" min="0" max="35" step="1" value="17" oninput="update()">
+        <div class="slider-ends"><span>0%</span><span>35%</span></div>
+        <div class="hint" id="hint-annual-discount">≈ 2 free months</div>
+      </div>
+
+      <div class="inp-divider"></div>
+      <div class="inp-section" style="color:var(--green);">Unit economics</div>
+      <div class="price-row">
+        <span class="price-lbl">Monthly fixed costs</span>
+        <div class="price-wrap"><span class="price-sym">$</span><input class="price-input" type="number" id="in-costs" value="8000" min="0" max="9999999" step="500" oninput="update()"></div>
+      </div>
+      <div class="hint" style="margin-bottom:12px;">Infra + salaries + ops</div>
+      <div class="price-row">
+        <span class="price-lbl">CAC per paid user</span>
+        <div class="price-wrap"><span class="price-sym">$</span><input class="price-input" type="number" id="in-cac" value="25" min="0" max="9999" step="1" oninput="update()"></div>
+      </div>
+
+    </div>
+
+    <!-- OUTPUTS -->
+    <div>
+
+      <!-- Row 1: revenue metrics -->
+      <div class="metrics-row">
+        <div class="mc t-red">
+          <div class="mc-lbl">Month 1 MRR</div>
+          <div class="mc-val" id="m-mrr1">—</div>
+          <div class="mc-sub" id="m-paid1">— paid users</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl" id="m-mrrN-lbl">Month 12 MRR</div>
+          <div class="mc-val" id="m-mrrN">—</div>
+          <div class="mc-sub" id="m-growth">+0% growth</div>
+        </div>
+        <div class="mc t-gold">
+          <div class="mc-lbl">Total revenue</div>
+          <div class="mc-val" id="m-total">—</div>
+          <div class="mc-sub" id="m-total-sub">over 12 months</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">End-period ARR</div>
+          <div class="mc-val" id="m-arr">—</div>
+          <div class="mc-sub">annualized run rate</div>
+        </div>
+      </div>
+
+      <!-- Row 2: health metrics -->
+      <div class="metrics-row">
+        <div class="mc t-blue">
+          <div class="mc-lbl">Customer LTV</div>
+          <div class="mc-val" id="m-ltv">—</div>
+          <div class="mc-sub" id="m-ltv-sub">ARPU ÷ churn rate</div>
+        </div>
+        <div class="mc t-blue">
+          <div class="mc-lbl">LTV : CAC</div>
+          <div class="mc-val" id="m-ltv-cac">—</div>
+          <div class="mc-sub" id="m-ltv-cac-sub">target ≥ 3× is healthy</div>
+        </div>
+        <div class="mc t-green">
+          <div class="mc-lbl">CAC payback</div>
+          <div class="mc-val" id="m-payback">—</div>
+          <div class="mc-sub">months to recover CAC</div>
+        </div>
+        <div class="mc t-green">
+          <div class="mc-lbl">Break-even</div>
+          <div class="mc-val" id="m-breakeven">—</div>
+          <div class="mc-sub" id="m-breakeven-sub">MRR vs monthly costs</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-card">
+        <div class="chart-top">
+          <span class="chart-title">MRR over time</span>
+          <div class="chart-legend" id="chart-legend"></div>
+        </div>
+        <div style="position:relative;height:240px;">
+          <canvas id="mrrChart" role="img" aria-label="Stacked area chart of MRR by tier with break-even line and scenario overlays"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Table + Export -->
+  <div class="table-section">
+    <div class="table-card">
+      <div class="table-top">
+        <span class="table-title">Monthly breakdown</span>
+        <button class="btn" onclick="exportCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="l">Mo</th>
+              <th class="r">Paid users</th>
+              <th class="r" style="color:var(--gold);">Coll. MRR</th>
+              <th class="r" style="color:var(--red);">Trader MRR</th>
+              <th class="r">Recog. MRR</th>
+              <th class="r" style="color:var(--blue);">Cash collected</th>
+              <th class="r" style="color:var(--green);">Monthly costs</th>
+              <th class="r">Net</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-note">
+    <strong style="color:var(--muted);">Model notes —</strong>
+    Recognized MRR uses accrual accounting: annual subscribers' fees are spread monthly at the discounted rate.
+    Cash collected shows monthly subscriber payments plus upfront cash from new annual sign-ups.
+    LTV = blended ARPU ÷ monthly churn rate. Break-even compares recognized MRR against fixed monthly costs.
+    ★ marks the break-even month in the table.
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let period = 12, chart = null, scenarios = [];
+const S_COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B'];
+
+function fmtM(n) {
+  n = Math.round(n);
+  if (n < 0) return '-' + fmtM(-n);
+  if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
+  if (n >= 1000) return '$' + (n/1000).toFixed(1) + 'K';
+  return '$' + n.toLocaleString();
+}
+function fmtN(n) {
+  n = Math.round(n);
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function el(id) { return document.getElementById(id); }
+
+function getParams() {
+  return {
+    startUsers: gv('sl-start'), growthPct: gv('sl-growth'),
+    convPct: gv('sl-conv'), churnPct: gv('sl-churn'),
+    collPct: gv('sl-coll'),
+    collPrice: Math.max(0, gv('in-coll')), tradPrice: Math.max(0, gv('in-trad')),
+    annualUptakePct: gv('sl-annual-uptake'), annualDiscountPct: gv('sl-annual-discount'),
+    monthlyCosts: Math.max(0, gv('in-costs')), cac: Math.max(0, gv('in-cac')),
+  };
+}
+
+function computeRows(p, params) {
+  const {startUsers, growthPct, convPct, churnPct, collPct, collPrice, tradPrice, annualUptakePct, annualDiscountPct} = params;
+  const gR = growthPct/100, cR = convPct/100, chR = churnPct/100;
+  const collR = collPct/100, tradR = 1 - collR;
+  const auR = annualUptakePct/100, adR = annualDiscountPct/100;
+  const annualEffect = 1 - auR * adR;
+  const baseARPU = collR * collPrice + tradR * tradPrice;
+
+  const rows = [];
+  let users = startUsers, paid = users * cR;
+  for (let m = 1; m <= p; m++) {
+    const newU = users * gR;
+    const newPaid = newU * cR;
+    paid = paid * (1 - chR) + newPaid;
+    users += newU;
+
+    const collMRR = paid * collR * collPrice * annualEffect;
+    const tradMRR = paid * tradR * tradPrice * annualEffect;
+    const mrr = collMRR + tradMRR;
+
+    // Cash: monthly subs pay this month; new annual subs pay full year upfront
+    const monthlyPaying = paid * (1 - auR);
+    const newAnnual = newPaid * auR;
+    const cash = monthlyPaying * baseARPU + newAnnual * baseARPU * 12 * (1 - adR);
+
+    rows.push({ m, users: Math.round(users), paid: Math.round(paid), collMRR: Math.round(collMRR), tradMRR: Math.round(tradMRR), mrr: Math.round(mrr), cash: Math.round(cash) });
+  }
+  return rows;
+}
+
+function setPeriod(p) {
+  period = p;
+  [6,12,24,36].forEach(v => el('p'+v).classList.toggle('active', v === p));
+  update();
+}
+
+function saveScenario() {
+  if (scenarios.length >= 4) { alert('Maximum 4 scenarios saved at once.'); return; }
+  const nameInput = el('scenario-name');
+  const name = nameInput.value.trim() || ('Scenario ' + (scenarios.length + 1));
+  scenarios.push({ name, color: S_COLORS[scenarios.length % S_COLORS.length], params: getParams() });
+  nameInput.value = '';
+  renderChips();
+  update();
+}
+
+function deleteScenario(i) {
+  scenarios.splice(i, 1);
+  renderChips();
+  update();
+}
+
+function renderChips() {
+  el('scenario-chips').innerHTML = scenarios.map((s, i) =>
+    `<span class="chip" style="border-color:${s.color};color:${s.color};background:${s.color}18;">
+      <span class="chip-dot" style="background:${s.color};"></span>${s.name}
+      <button class="chip-del" style="color:${s.color};" onclick="deleteScenario(${i})">×</button>
+    </span>`
+  ).join('');
+}
+
+function update() {
+  const params = getParams();
+  const {collPct, collPrice, tradPrice, churnPct, cac, monthlyCosts, annualUptakePct, annualDiscountPct} = params;
+  const collR = collPct/100, tradR = 1 - collR;
+  const auR = annualUptakePct/100, adR = annualDiscountPct/100;
+  const annualEffect = 1 - auR * adR;
+  const arpu = (collR * collPrice + tradR * tradPrice) * annualEffect;
+  const chR = churnPct/100;
+
+  // Update labels
+  el('lbl-start').textContent = fmtN(params.startUsers);
+  el('lbl-growth').textContent = params.growthPct + '%';
+  el('lbl-conv').textContent = params.convPct + '%';
+  el('lbl-churn').textContent = params.churnPct + '%';
+  el('lbl-coll-pct').textContent = collPct;
+  el('lbl-trad-pct').textContent = 100 - collPct;
+  el('bar-coll').style.flex = collPct;
+  el('bar-trad').style.flex = 100 - collPct;
+  el('lbl-annual-uptake').textContent = annualUptakePct + '%';
+  el('lbl-annual-discount').textContent = annualDiscountPct + '%';
+  const freeMo = (adR * 12).toFixed(1);
+  el('hint-annual-discount').textContent = adR > 0 ? ('≈ ' + freeMo + ' free months equivalent') : 'no discount';
+
+  const rows = computeRows(period, params);
+  const first = rows[0], last = rows[rows.length-1];
+  const totalRev = rows.reduce((s, r) => s + r.mrr, 0);
+  const growth = first.mrr > 0 ? Math.round((last.mrr - first.mrr) / first.mrr * 100) : 0;
+  const beIdx = monthlyCosts > 0 ? rows.findIndex(r => r.mrr >= monthlyCosts) : -1;
+  const beMonth = beIdx >= 0 ? beIdx + 1 : null;
+
+  // Row 1
+  el('m-mrr1').textContent = fmtM(first.mrr);
+  el('m-paid1').textContent = fmtN(first.paid) + ' paid users';
+  el('m-mrrN-lbl').textContent = 'Month ' + period + ' MRR';
+  el('m-mrrN').textContent = fmtM(last.mrr);
+  el('m-growth').textContent = '+' + growth + '% growth';
+  el('m-total').textContent = fmtM(totalRev);
+  el('m-total-sub').textContent = 'over ' + period + ' months';
+  el('m-arr').textContent = fmtM(last.mrr * 12);
+
+  // Row 2: health metrics
+  const ltv = chR > 0 ? arpu / chR : null;
+  const ltvCac = ltv !== null && cac > 0 ? ltv / cac : null;
+  const payback = arpu > 0 && cac > 0 ? Math.round(cac / arpu) : null;
+
+  el('m-ltv').textContent = ltv !== null ? fmtM(ltv) : '∞';
+  el('m-ltv-sub').textContent = 'ARPU: ' + fmtM(arpu) + '/mo';
+  if (cac === 0) {
+    el('m-ltv-cac').textContent = '—';
+    el('m-ltv-cac-sub').textContent = 'Set CAC to calculate';
+  } else if (ltvCac !== null) {
+    el('m-ltv-cac').textContent = ltvCac.toFixed(1) + '×';
+    el('m-ltv-cac-sub').textContent = ltvCac >= 3 ? '✓ healthy ratio' : (ltvCac >= 1 ? 'below target (3×)' : '⚠ unprofitable');
+  } else {
+    el('m-ltv-cac').textContent = '∞';
+    el('m-ltv-cac-sub').textContent = 'no churn modelled';
+  }
+  el('m-payback').textContent = payback !== null ? payback + ' mo' : (cac === 0 ? '—' : 'N/A');
+
+  if (monthlyCosts === 0) {
+    el('m-breakeven').textContent = '—';
+    el('m-breakeven-sub').textContent = 'Set monthly costs to track';
+  } else if (first.mrr >= monthlyCosts) {
+    el('m-breakeven').textContent = 'Month 1';
+    el('m-breakeven-sub').textContent = 'Already profitable at start';
+  } else if (beMonth === null) {
+    el('m-breakeven').textContent = 'Not in period';
+    el('m-breakeven-sub').textContent = 'Extend period or cut costs';
+  } else {
+    el('m-breakeven').textContent = 'Month ' + beMonth;
+    el('m-breakeven-sub').textContent = fmtM(monthlyCosts) + '/mo costs';
+  }
+
+  updateChart(rows, params);
+  renderTable(rows, params, beMonth);
+}
+
+function updateChart(rows, params) {
+  const {monthlyCosts} = params;
+  const labels = rows.map(r => 'M' + r.m);
+  const pr = period <= 12 ? 3 : 0;
+
+  // Always: Collector at index 0, Trader (total) at index 1
+  const datasets = [
+    { label: 'Collector', data: rows.map(r => r.collMRR), fill: 'origin', backgroundColor: 'rgba(201,168,76,0.18)', borderColor: '#C9A84C', borderWidth: 2, tension: 0.35, pointRadius: pr, pointBackgroundColor: '#C9A84C', pointBorderColor: '#fff', pointBorderWidth: 1.5 },
+    { label: 'Trader',    data: rows.map(r => r.mrr),     fill: 0,        backgroundColor: 'rgba(225,27,34,0.16)', borderColor: '#E11B22', borderWidth: 2, tension: 0.35, pointRadius: pr, pointBackgroundColor: '#E11B22', pointBorderColor: '#fff', pointBorderWidth: 1.5 },
+  ];
+
+  if (monthlyCosts > 0) {
+    datasets.push({ label: 'Monthly costs', data: Array(period).fill(monthlyCosts), borderColor: '#888', borderWidth: 1.5, borderDash: [6,4], fill: false, pointRadius: 0, tension: 0 });
+  }
+
+  scenarios.forEach(s => {
+    const sRows = computeRows(period, s.params);
+    datasets.push({ label: s.name, data: sRows.map(r => r.mrr), borderColor: s.color, borderWidth: 1.5, borderDash: [4,3], fill: false, pointRadius: 0, tension: 0.35 });
+  });
+
+  // Build legend HTML
+  let leg = `
+    <span class="leg"><span class="leg-pip" style="background:var(--gold);"></span>Collector</span>
+    <span class="leg"><span class="leg-pip" style="background:var(--red);"></span>Trader</span>`;
+  if (monthlyCosts > 0) leg += `<span class="leg"><span style="display:inline-block;width:14px;height:0;border-bottom:2px dashed #888;vertical-align:middle;"></span>&nbsp;Costs</span>`;
+  scenarios.forEach(s => { leg += `<span class="leg"><span style="display:inline-block;width:14px;height:0;border-bottom:2px dashed ${s.color};vertical-align:middle;"></span>&nbsp;${s.name}</span>`; });
+  el('chart-legend').innerHTML = leg;
+
+  if (chart) {
+    chart.data.labels = labels;
+    chart.data.datasets = datasets;
+    chart.update('none');
+  } else {
+    chart = new Chart(el('mrrChart'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1A1A1A', titleColor: '#999', bodyColor: '#eee',
+            borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, padding: 10,
+            callbacks: {
+              label: ctx => {
+                const lbl = ctx.dataset.label;
+                if (lbl === 'Trader') {
+                  const coll = ctx.chart.data.datasets[0].data[ctx.dataIndex] || 0;
+                  return '  Trader: ' + fmtM(ctx.parsed.y - coll);
+                }
+                if (lbl === 'Collector') return '  Collector: ' + fmtM(ctx.parsed.y);
+                if (lbl === 'Monthly costs') return '  Costs: ' + fmtM(ctx.parsed.y);
+                return '  ' + lbl + ': ' + fmtM(ctx.parsed.y);
+              },
+              footer: items => {
+                const t = items.find(i => i.dataset.label === 'Trader');
+                return t ? ['  Total MRR: ' + fmtM(t.parsed.y)] : [];
+              }
+            }
+          }
+        },
+        scales: {
+          y: { grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false }, ticks: { color: '#999', font: { size: 11 }, callback: v => fmtM(v) } },
+          x: { grid: { display: false }, border: { display: false }, ticks: { color: '#999', font: { size: 11 }, maxTicksLimit: 13 } }
+        }
+      }
+    });
+  }
+}
+
+function renderTable(rows, params, beMonth) {
+  const {monthlyCosts} = params;
+  el('tbl-body').innerHTML = rows.map(r => {
+    const net = r.mrr - monthlyCosts;
+    const isBE = r.m === beMonth;
+    const netTxt = monthlyCosts > 0 ? `<td class="r" style="font-weight:600;color:${net>=0?'#10B981':'#E11B22'};">${fmtM(net)}</td>` : `<td class="r" style="color:var(--faint);">—</td>`;
+    return `<tr${isBE?' class="be-row"':''}>
+      <td class="l mo-cell">${isBE?'★ ':''}M${r.m}</td>
+      <td class="r">${fmtN(r.paid)}</td>
+      <td class="r" style="color:var(--gold);font-weight:600;">${fmtM(r.collMRR)}</td>
+      <td class="r" style="color:var(--red);font-weight:600;">${fmtM(r.tradMRR)}</td>
+      <td class="r" style="font-weight:500;">${fmtM(r.mrr)}</td>
+      <td class="r" style="color:var(--blue);">${fmtM(r.cash)}</td>
+      <td class="r" style="color:var(--muted);">${monthlyCosts>0?fmtM(monthlyCosts):'—'}</td>
+      ${netTxt}
+    </tr>`;
+  }).join('');
+}
+
+function exportCSV() {
+  const params = getParams();
+  const rows = computeRows(period, params);
+  const headers = ['Month','Total Users','Paid Users','Collector MRR','Trader MRR','Recognized MRR','Cash Collected','Monthly Costs','Net MRR'];
+  const lines = [headers.join(','), ...rows.map(r => [
+    'M'+r.m, r.users, r.paid, r.collMRR, r.tradMRR, r.mrr, r.cash,
+    params.monthlyCosts, r.mrr - params.monthlyCosts
+  ].join(','))];
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'opcardx-revenue-' + period + 'mo.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+setPeriod(12);
+</script>
+</body>
+</html>
