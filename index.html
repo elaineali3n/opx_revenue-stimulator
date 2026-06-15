@@ -85,7 +85,13 @@
     .mc.t-gold  { border-top: 2.5px solid var(--gold); }
     .mc.t-blue  { border-top: 2.5px solid var(--blue); }
     .mc.t-green { border-top: 2.5px solid var(--green); }
-    .mc-lbl { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; }
+    .mc-lbl { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+    .tip { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 13px; height: 13px; border-radius: 50%; border: 1px solid var(--border-strong); color: var(--faint); font-size: 9px; font-weight: 700; cursor: help; text-transform: none; letter-spacing: 0; flex-shrink: 0; }
+    .tip:hover { border-color: var(--muted); color: var(--muted); }
+    .tip .tip-box { position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); width: 200px; background: #1A1A1A; color: #F0F0F0; font-size: 11px; font-weight: 400; line-height: 1.5; letter-spacing: 0; text-transform: none; text-align: left; padding: 9px 11px; border-radius: 8px; opacity: 0; visibility: hidden; transition: opacity .15s; z-index: 20; pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+    .tip .tip-box::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #1A1A1A; }
+    .tip:hover .tip-box { opacity: 1; visibility: visible; }
+    @media (max-width: 960px) { .tip .tip-box { left: 0; transform: none; } .tip .tip-box::after { left: 14px; } }
     .mc-val { font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1.15; }
     .mc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
@@ -251,7 +257,7 @@
           <div class="mc-sub" id="m-total-sub">over 12 months</div>
         </div>
         <div class="mc">
-          <div class="mc-lbl">End-period ARR</div>
+          <div class="mc-lbl">End-period ARR<span class="tip">?<span class="tip-box">Annual Recurring Revenue — the final month's MRR multiplied by 12. The run rate the business would hit annually if it stayed flat from here.</span></span></div>
           <div class="mc-val" id="m-arr">—</div>
           <div class="mc-sub">annualized run rate</div>
         </div>
@@ -260,22 +266,22 @@
       <!-- Row 2: health metrics -->
       <div class="metrics-row">
         <div class="mc t-blue">
-          <div class="mc-lbl">Customer LTV</div>
+          <div class="mc-lbl">Customer LTV<span class="tip">?<span class="tip-box">Lifetime Value — total revenue an average paying customer generates before they cancel. Higher churn means a shorter lifetime and lower LTV.</span></span></div>
           <div class="mc-val" id="m-ltv">—</div>
           <div class="mc-sub" id="m-ltv-sub">ARPU ÷ churn rate</div>
         </div>
         <div class="mc t-blue">
-          <div class="mc-lbl">LTV : CAC</div>
+          <div class="mc-lbl">LTV : CAC<span class="tip">?<span class="tip-box">How much a customer is worth versus what it costs to acquire them (CAC = customer acquisition cost). 3× or higher is considered healthy; below 1× means you lose money per customer.</span></span></div>
           <div class="mc-val" id="m-ltv-cac">—</div>
           <div class="mc-sub" id="m-ltv-cac-sub">target ≥ 3× is healthy</div>
         </div>
         <div class="mc t-green">
-          <div class="mc-lbl">CAC payback</div>
+          <div class="mc-lbl">CAC payback<span class="tip">?<span class="tip-box">How many months of subscription revenue it takes to recoup the cost of acquiring a customer. Shorter is better — under 12 months is generally strong.</span></span></div>
           <div class="mc-val" id="m-payback">—</div>
           <div class="mc-sub">months to recover CAC</div>
         </div>
         <div class="mc t-green">
-          <div class="mc-lbl">Break-even</div>
+          <div class="mc-lbl">Break-even<span class="tip">?<span class="tip-box">The month when recognized MRR first covers your fixed monthly costs. After this point the subscription business is self-sustaining. Marked with ★ in the table.</span></span></div>
           <div class="mc-val" id="m-breakeven">—</div>
           <div class="mc-sub" id="m-breakeven-sub">MRR vs monthly costs</div>
         </div>
