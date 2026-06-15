@@ -26,6 +26,7 @@
 
     /* Top controls */
     .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 12px; }
+    .top-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
     .period-row { display: flex; gap: 8px; }
     .period-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--muted); transition: all .15s; }
     .period-btn:hover { border-color: var(--red); color: var(--red); }
@@ -37,6 +38,14 @@
     .btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
     .btn-primary:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
 
+    /* Switch toggle */
+    .switch { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); cursor: pointer; user-select: none; }
+    .switch input { position: absolute; opacity: 0; pointer-events: none; }
+    .switch .track { width: 32px; height: 18px; border-radius: 10px; background: var(--border-strong); position: relative; transition: background .15s; flex-shrink: 0; }
+    .switch .track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+    .switch input:checked + .track { background: var(--red); }
+    .switch input:checked + .track::after { transform: translateX(14px); }
+
     /* Chips */
     .scenario-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
     .scenario-chips:empty { margin-bottom: 0; }
@@ -46,7 +55,8 @@
     .chip-del:hover { opacity: 1; }
 
     /* Main layout */
-    .main-grid { display: grid; grid-template-columns: 295px 1fr; gap: 20px; align-items: start; }
+    .main-grid { display: grid; grid-template-columns: 295px 1fr; gap: 20px; align-items: stretch; }
+    .output-col { display: flex; flex-direction: column; gap: 14px; }
 
     /* Inputs */
     .input-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: sticky; top: 20px; }
@@ -79,12 +89,14 @@
     .price-input { width: 62px; text-align: right; background: transparent; border: none; font-size: 13px; font-weight: 600; outline: none; color: var(--text); font-variant-numeric: tabular-nums; }
 
     /* Metric cards */
-    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .mc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; }
-    .mc.t-red   { border-top: 2.5px solid var(--red); }
-    .mc.t-gold  { border-top: 2.5px solid var(--gold); }
-    .mc.t-blue  { border-top: 2.5px solid var(--blue); }
-    .mc.t-green { border-top: 2.5px solid var(--green); }
+    .mc.t-red    { border-top: 2.5px solid var(--red); }
+    .mc.t-gold   { border-top: 2.5px solid var(--gold); }
+    .mc.t-blue   { border-top: 2.5px solid var(--blue); }
+    .mc.t-green  { border-top: 2.5px solid var(--green); }
+    .mc.t-purple { border-top: 2.5px solid var(--purple); }
+    .mc.t-amber  { border-top: 2.5px solid var(--amber); }
     .mc-lbl { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
     .tip { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 13px; height: 13px; border-radius: 50%; border: 1px solid var(--border-strong); color: var(--faint); font-size: 9px; font-weight: 700; cursor: help; text-transform: none; letter-spacing: 0; flex-shrink: 0; }
     .tip:hover { border-color: var(--muted); color: var(--muted); }
@@ -96,12 +108,14 @@
     .mc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
     /* Chart */
-    .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
-    .chart-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 12px; }
+    .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+    .chart-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+    .chart-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .chart-title { font-size: 14px; font-weight: 600; }
     .chart-legend { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
     .leg-pip { width: 12px; height: 3px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+    .chart-wrap { position: relative; flex: 1 1 auto; min-height: 360px; }
 
     /* Table */
     .table-section { margin-top: 20px; }
@@ -109,7 +123,7 @@
     .table-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); }
     .table-title { font-size: 14px; font-weight: 600; }
     .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 740px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 940px; }
     thead tr { background: #FAFAFA; border-bottom: 1px solid var(--border); }
     th { padding: 10px 14px; font-weight: 600; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; color: var(--muted); }
     th.l, td.l { text-align: left; }
@@ -118,16 +132,18 @@
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #F9F9F9; }
     tbody tr.be-row { background: #FFFBEA; }
-    td { padding: 9px 14px; font-variant-numeric: tabular-nums; color: var(--text); }
+    td { padding: 9px 14px; font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; }
     td.mo-cell { color: var(--muted); font-weight: 600; }
 
     /* Footer note */
     .model-note { margin-top: 20px; font-size: 11px; color: var(--faint); line-height: 1.7; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .model-note strong { color: var(--muted); }
 
     @media (max-width: 960px) {
       .main-grid { grid-template-columns: 1fr; }
       .input-panel { position: static; }
       .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .chart-wrap { min-height: 300px; }
     }
   </style>
 </head>
@@ -140,15 +156,22 @@
       <span class="eyebrow-sub">Finance · Subscription Model</span>
     </div>
     <h1>Subscription Revenue Simulator</h1>
-    <p>Collector & Trader tier MRR projections — model growth, annual plans, unit economics, and scenarios in one view</p>
+    <p>Collector &amp; Trader tier projections — recognized MRR, cash, deferred revenue, unit economics &amp; scenarios in one view</p>
   </div>
 
   <div class="top-bar">
-    <div class="period-row">
-      <button class="period-btn" id="p6" onclick="setPeriod(6)">6 months</button>
-      <button class="period-btn active" id="p12" onclick="setPeriod(12)">12 months</button>
-      <button class="period-btn" id="p24" onclick="setPeriod(24)">24 months</button>
-      <button class="period-btn" id="p36" onclick="setPeriod(36)">36 months</button>
+    <div class="top-left">
+      <div class="period-row">
+        <button class="period-btn" id="p6" onclick="setPeriod(6)">6 months</button>
+        <button class="period-btn active" id="p12" onclick="setPeriod(12)">12 months</button>
+        <button class="period-btn" id="p24" onclick="setPeriod(24)">24 months</button>
+        <button class="period-btn" id="p36" onclick="setPeriod(36)">36 months</button>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="tg-growth-m1" checked onchange="update()">
+        <span class="track"></span>
+        Growth from M1
+      </label>
     </div>
     <div class="scenario-controls">
       <input class="scenario-input" type="text" id="scenario-name" placeholder="Name this scenario…" maxlength="24">
@@ -189,10 +212,11 @@
         <div class="slider-row"><span class="slider-lbl">Monthly churn</span><span class="slider-val" id="lbl-churn">3%</span></div>
         <input type="range" class="r-gold" id="sl-churn" min="0" max="15" step="0.25" value="3" oninput="update()">
         <div class="slider-ends"><span>0%</span><span>15%</span></div>
+        <div class="hint">Annual plans renew yearly at the implied retention</div>
       </div>
 
       <div class="inp-divider"></div>
-      <div class="inp-section" style="color:var(--muted);">Tier mix & pricing</div>
+      <div class="inp-section" style="color:var(--muted);">Tier mix &amp; pricing</div>
       <div class="slider-group">
         <div class="tier-bar"><div id="bar-coll" style="background:var(--gold);flex:65;"></div><div id="bar-trad" style="background:var(--red);flex:35;"></div></div>
         <input type="range" class="r-gray" id="sl-coll" min="10" max="90" step="1" value="65" oninput="update()">
@@ -224,11 +248,17 @@
 
       <div class="inp-divider"></div>
       <div class="inp-section" style="color:var(--green);">Unit economics</div>
-      <div class="price-row">
+      <div class="slider-group">
+        <div class="slider-row"><span class="slider-lbl">Gross margin</span><span class="slider-val" id="lbl-margin">80%</span></div>
+        <input type="range" class="r-green" id="sl-margin" min="20" max="100" step="1" value="80" oninput="update()">
+        <div class="slider-ends"><span>20%</span><span>100%</span></div>
+        <div class="hint">After payment fees, infra-per-user, content costs</div>
+      </div>
+      <div class="price-row" style="margin-top:12px;">
         <span class="price-lbl">Monthly fixed costs</span>
         <div class="price-wrap"><span class="price-sym">$</span><input class="price-input" type="number" id="in-costs" value="8000" min="0" max="9999999" step="500" oninput="update()"></div>
       </div>
-      <div class="hint" style="margin-bottom:12px;">Infra + salaries + ops</div>
+      <div class="hint" style="margin-bottom:12px;">Salaries + base infra + ops</div>
       <div class="price-row">
         <span class="price-lbl">CAC per paid user</span>
         <div class="price-wrap"><span class="price-sym">$</span><input class="price-input" type="number" id="in-cac" value="25" min="0" max="9999" step="1" oninput="update()"></div>
@@ -237,7 +267,7 @@
     </div>
 
     <!-- OUTPUTS -->
-    <div>
+    <div class="output-col">
 
       <!-- Row 1: revenue metrics -->
       <div class="metrics-row">
@@ -252,7 +282,7 @@
           <div class="mc-sub" id="m-growth">+0% growth</div>
         </div>
         <div class="mc t-gold">
-          <div class="mc-lbl">Total revenue</div>
+          <div class="mc-lbl">Recognized revenue<span class="tip">?<span class="tip-box">Total recognized (accrual) MRR summed across the period. Annual plans are recognized 1/12 per month, not when cash lands.</span></span></div>
           <div class="mc-val" id="m-total">—</div>
           <div class="mc-sub" id="m-total-sub">over 12 months</div>
         </div>
@@ -263,38 +293,69 @@
         </div>
       </div>
 
-      <!-- Row 2: health metrics -->
+      <!-- Row 2: unit economics -->
       <div class="metrics-row">
         <div class="mc t-blue">
-          <div class="mc-lbl">Customer LTV<span class="tip">?<span class="tip-box">Lifetime Value — total revenue an average paying customer generates before they cancel. Higher churn means a shorter lifetime and lower LTV.</span></span></div>
+          <div class="mc-lbl">Customer LTV<span class="tip">?<span class="tip-box">Lifetime Value on a gross-margin basis — (ARPU × gross margin) ÷ monthly churn. Uses contribution margin, not raw revenue, so it reflects actual profit per customer.</span></span></div>
           <div class="mc-val" id="m-ltv">—</div>
-          <div class="mc-sub" id="m-ltv-sub">ARPU ÷ churn rate</div>
+          <div class="mc-sub" id="m-ltv-sub">margin-based</div>
         </div>
         <div class="mc t-blue">
-          <div class="mc-lbl">LTV : CAC<span class="tip">?<span class="tip-box">How much a customer is worth versus what it costs to acquire them (CAC = customer acquisition cost). 3× or higher is considered healthy; below 1× means you lose money per customer.</span></span></div>
+          <div class="mc-lbl">LTV : CAC<span class="tip">?<span class="tip-box">Margin-based customer value versus acquisition cost (CAC). 3× or higher is considered healthy; below 1× means you lose money per customer.</span></span></div>
           <div class="mc-val" id="m-ltv-cac">—</div>
           <div class="mc-sub" id="m-ltv-cac-sub">target ≥ 3× is healthy</div>
         </div>
         <div class="mc t-green">
-          <div class="mc-lbl">CAC payback<span class="tip">?<span class="tip-box">How many months of subscription revenue it takes to recoup the cost of acquiring a customer. Shorter is better — under 12 months is generally strong.</span></span></div>
+          <div class="mc-lbl">CAC payback<span class="tip">?<span class="tip-box">Months of gross-margin subscription revenue needed to recoup the cost of acquiring a customer. Under 12 months is generally strong.</span></span></div>
           <div class="mc-val" id="m-payback">—</div>
           <div class="mc-sub">months to recover CAC</div>
         </div>
         <div class="mc t-green">
-          <div class="mc-lbl">Break-even<span class="tip">?<span class="tip-box">The month when recognized MRR first covers your fixed monthly costs. After this point the subscription business is self-sustaining. Marked with ★ in the table.</span></span></div>
+          <div class="mc-lbl">Operating break-even<span class="tip">?<span class="tip-box">First month recognized MRR covers fixed monthly costs only (excludes CAC). The point the business is self-sustaining on recurring revenue alone. Marked ★ in the table.</span></span></div>
           <div class="mc-val" id="m-breakeven">—</div>
-          <div class="mc-sub" id="m-breakeven-sub">MRR vs monthly costs</div>
+          <div class="mc-sub" id="m-breakeven-sub">MRR vs fixed costs</div>
+        </div>
+      </div>
+
+      <!-- Row 3: cash & balance sheet -->
+      <div class="metrics-row">
+        <div class="mc t-amber">
+          <div class="mc-lbl">Cash-flow break-even<span class="tip">?<span class="tip-box">First month net cash flow turns positive — cash collected covers fixed costs AND acquisition spend (CAC). This is later than operating break-even because it includes the cost of growth.</span></span></div>
+          <div class="mc-val" id="m-cashbe">—</div>
+          <div class="mc-sub" id="m-cashbe-sub">incl. CAC spend</div>
+        </div>
+        <div class="mc t-red">
+          <div class="mc-lbl">Peak funding need<span class="tip">?<span class="tip-box">The lowest the cumulative cash balance reaches — i.e. how much capital you must raise/hold to fund the business to its trough before it self-funds. Shown as a positive funding requirement.</span></span></div>
+          <div class="mc-val" id="m-lowcash">—</div>
+          <div class="mc-sub" id="m-lowcash-sub">max cumulative burn</div>
+        </div>
+        <div class="mc t-purple">
+          <div class="mc-lbl">Deferred revenue<span class="tip">?<span class="tip-box">End-of-period deferred revenue liability — upfront annual cash collected but not yet recognized. A balance-sheet liability that unwinds 1/12 per month as service is delivered.</span></span></div>
+          <div class="mc-val" id="m-dr">—</div>
+          <div class="mc-sub" id="m-dr-sub">end-period balance</div>
+        </div>
+        <div class="mc t-blue">
+          <div class="mc-lbl">Cash collected<span class="tip">?<span class="tip-box">Total cash actually received over the period — monthly fees plus full upfront payments from new and renewing annual subscribers. Differs from recognized revenue by the change in deferred revenue.</span></span></div>
+          <div class="mc-val" id="m-cashtot">—</div>
+          <div class="mc-sub" id="m-cashtot-sub">over 12 months</div>
         </div>
       </div>
 
       <!-- Chart -->
       <div class="chart-card">
         <div class="chart-top">
-          <span class="chart-title">MRR over time</span>
+          <div class="chart-head">
+            <span class="chart-title">MRR &amp; cash over time</span>
+            <label class="switch">
+              <input type="checkbox" id="tg-cumcash" checked onchange="update()">
+              <span class="track"></span>
+              Cumulative cash
+            </label>
+          </div>
           <div class="chart-legend" id="chart-legend"></div>
         </div>
-        <div style="position:relative;height:240px;">
-          <canvas id="mrrChart" role="img" aria-label="Stacked area chart of MRR by tier with break-even line and scenario overlays"></canvas>
+        <div class="chart-wrap">
+          <canvas id="mrrChart" role="img" aria-label="Area chart of MRR by tier with fixed-cost line, cumulative cash flow, and scenario overlays"></canvas>
         </div>
       </div>
 
@@ -316,13 +377,16 @@
           <thead>
             <tr>
               <th class="l">Mo</th>
-              <th class="r">Paid users</th>
+              <th class="r">Paid</th>
               <th class="r" style="color:var(--gold);">Coll. MRR</th>
               <th class="r" style="color:var(--red);">Trader MRR</th>
               <th class="r">Recog. MRR</th>
-              <th class="r" style="color:var(--blue);">Cash collected</th>
-              <th class="r" style="color:var(--green);">Monthly costs</th>
-              <th class="r">Net</th>
+              <th class="r" style="color:var(--green);">+ New</th>
+              <th class="r" style="color:var(--red);">− Churn</th>
+              <th class="r" style="color:var(--blue);">Cash</th>
+              <th class="r" style="color:var(--purple);">Def. rev</th>
+              <th class="r" style="color:var(--amber);">CAC</th>
+              <th class="r">Net cash</th>
             </tr>
           </thead>
           <tbody id="tbl-body"></tbody>
@@ -332,11 +396,13 @@
   </div>
 
   <div class="model-note">
-    <strong style="color:var(--muted);">Model notes —</strong>
-    Recognized MRR uses accrual accounting: annual subscribers' fees are spread monthly at the discounted rate.
-    Cash collected shows monthly subscriber payments plus upfront cash from new annual sign-ups.
-    LTV = blended ARPU ÷ monthly churn rate. Break-even compares recognized MRR against fixed monthly costs.
-    ★ marks the break-even month in the table.
+    <strong>Model notes —</strong>
+    <em>Recognized MRR</em> is accrual-based: monthly plans recognize full price; annual plans recognize the discounted price 1/12 per month.
+    <em>Cash</em> is monthly fees plus full upfront payments from new and renewing annual subscribers.
+    <em>Deferred revenue</em> is the upfront annual cash not yet recognized; it unwinds 1/12 monthly. The starting annual base is assumed uniformly aged (≈half its term remaining).
+    <em>Annual plans</em> are committed for 12 months (no mid-term churn) and renew at the retention implied by monthly churn, (1−churn)¹².
+    <em>Net cash</em> = cash collected − fixed costs − CAC spend (CAC = new paid users × cost per acquisition).
+    <em>LTV</em> uses gross margin, so it reflects contribution, not revenue. Expansion/contraction MRR is not modelled (no plan upgrades). ★ marks operating break-even.
   </div>
 
 </div>
@@ -369,36 +435,95 @@ function getParams() {
     collPct: gv('sl-coll'),
     collPrice: Math.max(0, gv('in-coll')), tradPrice: Math.max(0, gv('in-trad')),
     annualUptakePct: gv('sl-annual-uptake'), annualDiscountPct: gv('sl-annual-discount'),
+    marginPct: gv('sl-margin'),
     monthlyCosts: Math.max(0, gv('in-costs')), cac: Math.max(0, gv('in-cac')),
+    growthFromM1: el('tg-growth-m1').checked,
   };
 }
 
 function computeRows(p, params) {
-  const {startUsers, growthPct, convPct, churnPct, collPct, collPrice, tradPrice, annualUptakePct, annualDiscountPct} = params;
+  const {startUsers, growthPct, convPct, churnPct, collPct, collPrice, tradPrice,
+         annualUptakePct, annualDiscountPct, cac, monthlyCosts, growthFromM1} = params;
   const gR = growthPct/100, cR = convPct/100, chR = churnPct/100;
   const collR = collPct/100, tradR = 1 - collR;
   const auR = annualUptakePct/100, adR = annualDiscountPct/100;
-  const annualEffect = 1 - auR * adR;
-  const baseARPU = collR * collPrice + tradR * tradPrice;
+
+  const baseARPU = collR*collPrice + tradR*tradPrice;     // undiscounted blended monthly price
+  const annualMoRate = baseARPU * (1 - adR);              // recognized monthly rate for annual subs
+  const annualUpfront = baseARPU * 12 * (1 - adR);        // upfront cash per annual sub
+  const collRevFrac = baseARPU > 0 ? (collR*collPrice)/baseARPU : collR;
+  const annualRetention = Math.pow(1 - chR, 12);          // yearly retention implied by monthly churn
+
+  // Seed paid base, split monthly vs annual
+  let paidMonthly = startUsers * cR * (1 - auR);
+  let paidAnnual  = startUsers * cR * auR;
+  let users = startUsers;
+
+  // Annual renewal schedule (units whose 12-mo term expires in a given month).
+  // Seed annual base assumed uniformly aged across the coming 12 months.
+  const renew = {};
+  const seedAnnual = paidAnnual;
+  for (let k = 1; k <= 12; k++) renew[k] = (renew[k] || 0) + seedAnnual/12;
+
+  // Deferred revenue: seed at ~half (uniform aging => avg half the term unrecognized)
+  let dr = seedAnnual * annualUpfront * 0.5;
+  let cumCash = 0;
 
   const rows = [];
-  let users = startUsers, paid = users * cR;
   for (let m = 1; m <= p; m++) {
-    const newU = users * gR;
-    const newPaid = newU * cR;
-    paid = paid * (1 - chR) + newPaid;
+    const applyGrowth = growthFromM1 ? true : (m > 1);
+    const newU = applyGrowth ? users * gR : 0;
+    const newPaid = newU * cR;                 // conversions come from newly acquired users
     users += newU;
 
-    const collMRR = paid * collR * collPrice * annualEffect;
-    const tradMRR = paid * tradR * tradPrice * annualEffect;
-    const mrr = collMRR + tradMRR;
-
-    // Cash: monthly subs pay this month; new annual subs pay full year upfront
-    const monthlyPaying = paid * (1 - auR);
     const newAnnual = newPaid * auR;
-    const cash = monthlyPaying * baseARPU + newAnnual * baseARPU * 12 * (1 - adR);
+    const newMonthly = newPaid * (1 - auR);
 
-    rows.push({ m, users: Math.round(users), paid: Math.round(paid), collMRR: Math.round(collMRR), tradMRR: Math.round(tradMRR), mrr: Math.round(mrr), cash: Math.round(cash) });
+    // Monthly subscribers churn each month
+    const churnMonthlyUnits = paidMonthly * chR;
+    paidMonthly = paidMonthly - churnMonthlyUnits + newMonthly;
+
+    // Annual cohorts: those expiring this month either renew or lapse
+    const expiring = renew[m] || 0;
+    const renewed = expiring * annualRetention;
+    const notRenewed = expiring - renewed;
+    paidAnnual = paidAnnual - notRenewed + newAnnual;
+    renew[m+12] = (renew[m+12] || 0) + newAnnual + renewed; // committed 12 months out
+
+    // Recognized MRR
+    const monthlyMRR = paidMonthly * baseARPU;
+    const annualMRR  = paidAnnual * annualMoRate;
+    const mrr = monthlyMRR + annualMRR;
+    const collMRR = mrr * collRevFrac;
+    const tradMRR = mrr - collMRR;
+
+    // MRR movement (bridge): new from conversions, churned from monthly churn + annual lapses
+    const newMRR = newMonthly * baseARPU + newAnnual * annualMoRate;
+    const churnedMRR = churnMonthlyUnits * baseARPU + notRenewed * annualMoRate;
+
+    // Cash: monthly fees this month + upfront from new AND renewing annual subs
+    const monthlyCash = paidMonthly * baseARPU;
+    const annualCashUnits = newAnnual + renewed;
+    const annualCash = annualCashUnits * annualUpfront;
+    const cash = monthlyCash + annualCash;
+
+    // Deferred revenue rolls forward: + upfront cash collected, − amount recognized
+    dr = Math.max(0, dr + annualCash - annualMRR);
+
+    // CAC + net cash flow
+    const cacSpend = newPaid * cac;
+    const netCash = cash - (monthlyCosts || 0) - cacSpend;
+    cumCash += netCash;
+
+    const paid = paidMonthly + paidAnnual;
+    rows.push({
+      m, users: Math.round(users), paid: Math.round(paid),
+      paidMonthly: Math.round(paidMonthly), paidAnnual: Math.round(paidAnnual),
+      collMRR: Math.round(collMRR), tradMRR: Math.round(tradMRR), mrr: Math.round(mrr),
+      newMRR: Math.round(newMRR), churnedMRR: Math.round(churnedMRR),
+      cash: Math.round(cash), dr: Math.round(dr),
+      cacSpend: Math.round(cacSpend), netCash: Math.round(netCash), cumCash: Math.round(cumCash),
+    });
   }
   return rows;
 }
@@ -436,14 +561,13 @@ function renderChips() {
 
 function update() {
   const params = getParams();
-  const {collPct, collPrice, tradPrice, churnPct, cac, monthlyCosts, annualUptakePct, annualDiscountPct} = params;
+  const {collPct, collPrice, tradPrice, churnPct, cac, monthlyCosts,
+         annualUptakePct, annualDiscountPct, marginPct} = params;
   const collR = collPct/100, tradR = 1 - collR;
   const auR = annualUptakePct/100, adR = annualDiscountPct/100;
-  const annualEffect = 1 - auR * adR;
-  const arpu = (collR * collPrice + tradR * tradPrice) * annualEffect;
-  const chR = churnPct/100;
+  const chR = churnPct/100, gmR = marginPct/100;
 
-  // Update labels
+  // Labels
   el('lbl-start').textContent = fmtN(params.startUsers);
   el('lbl-growth').textContent = params.growthPct + '%';
   el('lbl-conv').textContent = params.convPct + '%';
@@ -454,33 +578,43 @@ function update() {
   el('bar-trad').style.flex = 100 - collPct;
   el('lbl-annual-uptake').textContent = annualUptakePct + '%';
   el('lbl-annual-discount').textContent = annualDiscountPct + '%';
+  el('lbl-margin').textContent = marginPct + '%';
   const freeMo = (adR * 12).toFixed(1);
   el('hint-annual-discount').textContent = adR > 0 ? ('≈ ' + freeMo + ' free months equivalent') : 'no discount';
 
   const rows = computeRows(period, params);
   const first = rows[0], last = rows[rows.length-1];
   const totalRev = rows.reduce((s, r) => s + r.mrr, 0);
+  const totalCash = rows.reduce((s, r) => s + r.cash, 0);
   const growth = first.mrr > 0 ? Math.round((last.mrr - first.mrr) / first.mrr * 100) : 0;
-  const beIdx = monthlyCosts > 0 ? rows.findIndex(r => r.mrr >= monthlyCosts) : -1;
-  const beMonth = beIdx >= 0 ? beIdx + 1 : null;
+
+  // Blended recognized ARPU from the latest month
+  const arpu = last.paid > 0 ? last.mrr / last.paid : 0;
+  const marginArpu = arpu * gmR;
+
+  // Break-evens
+  const opBeIdx = monthlyCosts > 0 ? rows.findIndex(r => r.mrr >= monthlyCosts) : -1;
+  const opBeMonth = opBeIdx >= 0 ? opBeIdx + 1 : null;
+  const cashBeIdx = rows.findIndex(r => r.netCash >= 0);
+  const cashBeMonth = cashBeIdx >= 0 ? cashBeIdx + 1 : null;
 
   // Row 1
   el('m-mrr1').textContent = fmtM(first.mrr);
   el('m-paid1').textContent = fmtN(first.paid) + ' paid users';
   el('m-mrrN-lbl').textContent = 'Month ' + period + ' MRR';
   el('m-mrrN').textContent = fmtM(last.mrr);
-  el('m-growth').textContent = '+' + growth + '% growth';
+  el('m-growth').textContent = (growth >= 0 ? '+' : '') + growth + '% over period';
   el('m-total').textContent = fmtM(totalRev);
   el('m-total-sub').textContent = 'over ' + period + ' months';
   el('m-arr').textContent = fmtM(last.mrr * 12);
 
-  // Row 2: health metrics
-  const ltv = chR > 0 ? arpu / chR : null;
+  // Row 2: unit economics (margin-based)
+  const ltv = chR > 0 ? marginArpu / chR : null;
   const ltvCac = ltv !== null && cac > 0 ? ltv / cac : null;
-  const payback = arpu > 0 && cac > 0 ? Math.round(cac / arpu) : null;
+  const payback = marginArpu > 0 && cac > 0 ? cac / marginArpu : null;
 
   el('m-ltv').textContent = ltv !== null ? fmtM(ltv) : '∞';
-  el('m-ltv-sub').textContent = 'ARPU: ' + fmtM(arpu) + '/mo';
+  el('m-ltv-sub').textContent = 'ARPU ' + fmtM(arpu) + ' · ' + marginPct + '% margin';
   if (cac === 0) {
     el('m-ltv-cac').textContent = '—';
     el('m-ltv-cac-sub').textContent = 'Set CAC to calculate';
@@ -491,57 +625,92 @@ function update() {
     el('m-ltv-cac').textContent = '∞';
     el('m-ltv-cac-sub').textContent = 'no churn modelled';
   }
-  el('m-payback').textContent = payback !== null ? payback + ' mo' : (cac === 0 ? '—' : 'N/A');
+  el('m-payback').textContent = payback !== null ? (payback >= 1 ? Math.round(payback) + ' mo' : payback.toFixed(1) + ' mo') : (cac === 0 ? '—' : 'N/A');
 
   if (monthlyCosts === 0) {
     el('m-breakeven').textContent = '—';
-    el('m-breakeven-sub').textContent = 'Set monthly costs to track';
+    el('m-breakeven-sub').textContent = 'Set fixed costs to track';
   } else if (first.mrr >= monthlyCosts) {
     el('m-breakeven').textContent = 'Month 1';
-    el('m-breakeven-sub').textContent = 'Already profitable at start';
-  } else if (beMonth === null) {
+    el('m-breakeven-sub').textContent = 'MRR covers costs at start';
+  } else if (opBeMonth === null) {
     el('m-breakeven').textContent = 'Not in period';
     el('m-breakeven-sub').textContent = 'Extend period or cut costs';
   } else {
-    el('m-breakeven').textContent = 'Month ' + beMonth;
-    el('m-breakeven-sub').textContent = fmtM(monthlyCosts) + '/mo costs';
+    el('m-breakeven').textContent = 'Month ' + opBeMonth;
+    el('m-breakeven-sub').textContent = fmtM(monthlyCosts) + '/mo fixed costs';
   }
 
+  // Row 3: cash & balance sheet
+  if (first.netCash >= 0) {
+    el('m-cashbe').textContent = 'Month 1';
+    el('m-cashbe-sub').textContent = 'cash-positive at start';
+  } else if (cashBeMonth === null) {
+    el('m-cashbe').textContent = 'Not in period';
+    el('m-cashbe-sub').textContent = 'still burning at period end';
+  } else {
+    el('m-cashbe').textContent = 'Month ' + cashBeMonth;
+    el('m-cashbe-sub').textContent = 'incl. CAC spend';
+  }
+
+  const minCum = Math.min(0, ...rows.map(r => r.cumCash));
+  const minIdx = rows.reduce((mi, r, i) => r.cumCash < rows[mi].cumCash ? i : mi, 0);
+  el('m-lowcash').textContent = minCum < 0 ? fmtM(-minCum) : '$0';
+  el('m-lowcash-sub').textContent = minCum < 0 ? ('trough at Month ' + (minIdx + 1)) : 'never cash-negative';
+
+  el('m-dr').textContent = fmtM(last.dr);
+  el('m-dr-sub').textContent = 'liability · Month ' + period;
+
+  el('m-cashtot').textContent = fmtM(totalCash);
+  el('m-cashtot-sub').textContent = 'over ' + period + ' months';
+
   updateChart(rows, params);
-  renderTable(rows, params, beMonth);
+  renderTable(rows, params, opBeMonth);
 }
 
 function updateChart(rows, params) {
   const {monthlyCosts} = params;
+  const showCum = el('tg-cumcash').checked;
   const labels = rows.map(r => 'M' + r.m);
   const pr = period <= 12 ? 3 : 0;
 
-  // Always: Collector at index 0, Trader (total) at index 1
   const datasets = [
-    { label: 'Collector', data: rows.map(r => r.collMRR), fill: 'origin', backgroundColor: 'rgba(201,168,76,0.18)', borderColor: '#C9A84C', borderWidth: 2, tension: 0.35, pointRadius: pr, pointBackgroundColor: '#C9A84C', pointBorderColor: '#fff', pointBorderWidth: 1.5 },
-    { label: 'Trader',    data: rows.map(r => r.mrr),     fill: 0,        backgroundColor: 'rgba(225,27,34,0.16)', borderColor: '#E11B22', borderWidth: 2, tension: 0.35, pointRadius: pr, pointBackgroundColor: '#E11B22', pointBorderColor: '#fff', pointBorderWidth: 1.5 },
+    { label: 'Collector', data: rows.map(r => r.collMRR), fill: 'origin', backgroundColor: 'rgba(201,168,76,0.18)', borderColor: '#C9A84C', borderWidth: 2, tension: 0.35, pointRadius: pr, pointBackgroundColor: '#C9A84C', pointBorderColor: '#fff', pointBorderWidth: 1.5, yAxisID: 'y', order: 3 },
+    { label: 'Trader',    data: rows.map(r => r.mrr),     fill: 0,        backgroundColor: 'rgba(225,27,34,0.16)', borderColor: '#E11B22', borderWidth: 2, tension: 0.35, pointRadius: pr, pointBackgroundColor: '#E11B22', pointBorderColor: '#fff', pointBorderWidth: 1.5, yAxisID: 'y', order: 3 },
   ];
 
   if (monthlyCosts > 0) {
-    datasets.push({ label: 'Monthly costs', data: Array(period).fill(monthlyCosts), borderColor: '#888', borderWidth: 1.5, borderDash: [6,4], fill: false, pointRadius: 0, tension: 0 });
+    datasets.push({ label: 'Fixed costs', data: Array(rows.length).fill(monthlyCosts), borderColor: '#888', borderWidth: 1.5, borderDash: [6,4], fill: false, pointRadius: 0, tension: 0, yAxisID: 'y', order: 2 });
+  }
+
+  if (showCum) {
+    datasets.push({ label: 'Cumulative cash', data: rows.map(r => r.cumCash), borderColor: '#10B981', borderWidth: 2, fill: false, pointRadius: 0, tension: 0.3, yAxisID: 'y1', order: 1 });
   }
 
   scenarios.forEach(s => {
     const sRows = computeRows(period, s.params);
-    datasets.push({ label: s.name, data: sRows.map(r => r.mrr), borderColor: s.color, borderWidth: 1.5, borderDash: [4,3], fill: false, pointRadius: 0, tension: 0.35 });
+    datasets.push({ label: s.name, data: sRows.map(r => r.mrr), borderColor: s.color, borderWidth: 1.5, borderDash: [4,3], fill: false, pointRadius: 0, tension: 0.35, yAxisID: 'y', order: 0 });
   });
 
-  // Build legend HTML
+  // Legend
   let leg = `
     <span class="leg"><span class="leg-pip" style="background:var(--gold);"></span>Collector</span>
     <span class="leg"><span class="leg-pip" style="background:var(--red);"></span>Trader</span>`;
-  if (monthlyCosts > 0) leg += `<span class="leg"><span style="display:inline-block;width:14px;height:0;border-bottom:2px dashed #888;vertical-align:middle;"></span>&nbsp;Costs</span>`;
+  if (monthlyCosts > 0) leg += `<span class="leg"><span style="display:inline-block;width:14px;height:0;border-bottom:2px dashed #888;vertical-align:middle;"></span>&nbsp;Fixed costs</span>`;
+  if (showCum) leg += `<span class="leg"><span class="leg-pip" style="background:var(--green);"></span>Cumulative cash</span>`;
   scenarios.forEach(s => { leg += `<span class="leg"><span style="display:inline-block;width:14px;height:0;border-bottom:2px dashed ${s.color};vertical-align:middle;"></span>&nbsp;${s.name}</span>`; });
   el('chart-legend').innerHTML = leg;
+
+  const scales = {
+    y: { position: 'left', grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false }, ticks: { color: '#999', font: { size: 11 }, callback: v => fmtM(v) } },
+    y1: { position: 'right', display: showCum, grid: { drawOnChartArea: false }, border: { display: false }, ticks: { color: '#10B981', font: { size: 11 }, callback: v => fmtM(v) } },
+    x: { grid: { display: false }, border: { display: false }, ticks: { color: '#999', font: { size: 11 }, maxTicksLimit: 13 } }
+  };
 
   if (chart) {
     chart.data.labels = labels;
     chart.data.datasets = datasets;
+    chart.options.scales = scales;
     chart.update('none');
   } else {
     chart = new Chart(el('mrrChart'), {
@@ -564,7 +733,8 @@ function updateChart(rows, params) {
                   return '  Trader: ' + fmtM(ctx.parsed.y - coll);
                 }
                 if (lbl === 'Collector') return '  Collector: ' + fmtM(ctx.parsed.y);
-                if (lbl === 'Monthly costs') return '  Costs: ' + fmtM(ctx.parsed.y);
+                if (lbl === 'Fixed costs') return '  Fixed costs: ' + fmtM(ctx.parsed.y);
+                if (lbl === 'Cumulative cash') return '  Cumulative cash: ' + fmtM(ctx.parsed.y);
                 return '  ' + lbl + ': ' + fmtM(ctx.parsed.y);
               },
               footer: items => {
@@ -574,30 +744,28 @@ function updateChart(rows, params) {
             }
           }
         },
-        scales: {
-          y: { grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false }, ticks: { color: '#999', font: { size: 11 }, callback: v => fmtM(v) } },
-          x: { grid: { display: false }, border: { display: false }, ticks: { color: '#999', font: { size: 11 }, maxTicksLimit: 13 } }
-        }
+        scales
       }
     });
   }
 }
 
 function renderTable(rows, params, beMonth) {
-  const {monthlyCosts} = params;
   el('tbl-body').innerHTML = rows.map(r => {
-    const net = r.mrr - monthlyCosts;
     const isBE = r.m === beMonth;
-    const netTxt = monthlyCosts > 0 ? `<td class="r" style="font-weight:600;color:${net>=0?'#10B981':'#E11B22'};">${fmtM(net)}</td>` : `<td class="r" style="color:var(--faint);">—</td>`;
+    const netColor = r.netCash >= 0 ? '#10B981' : '#E11B22';
     return `<tr${isBE?' class="be-row"':''}>
       <td class="l mo-cell">${isBE?'★ ':''}M${r.m}</td>
       <td class="r">${fmtN(r.paid)}</td>
       <td class="r" style="color:var(--gold);font-weight:600;">${fmtM(r.collMRR)}</td>
       <td class="r" style="color:var(--red);font-weight:600;">${fmtM(r.tradMRR)}</td>
       <td class="r" style="font-weight:500;">${fmtM(r.mrr)}</td>
+      <td class="r" style="color:var(--green);">+${fmtM(r.newMRR)}</td>
+      <td class="r" style="color:var(--red);">−${fmtM(r.churnedMRR)}</td>
       <td class="r" style="color:var(--blue);">${fmtM(r.cash)}</td>
-      <td class="r" style="color:var(--muted);">${monthlyCosts>0?fmtM(monthlyCosts):'—'}</td>
-      ${netTxt}
+      <td class="r" style="color:var(--purple);">${fmtM(r.dr)}</td>
+      <td class="r" style="color:var(--amber);">${fmtM(r.cacSpend)}</td>
+      <td class="r" style="font-weight:600;color:${netColor};">${fmtM(r.netCash)}</td>
     </tr>`;
   }).join('');
 }
@@ -605,10 +773,13 @@ function renderTable(rows, params, beMonth) {
 function exportCSV() {
   const params = getParams();
   const rows = computeRows(period, params);
-  const headers = ['Month','Total Users','Paid Users','Collector MRR','Trader MRR','Recognized MRR','Cash Collected','Monthly Costs','Net MRR'];
+  const headers = ['Month','Total Users','Paid Users','Paid Monthly','Paid Annual',
+    'Collector MRR','Trader MRR','Recognized MRR','New MRR','Churned MRR',
+    'Cash Collected','Deferred Revenue','Monthly Fixed Costs','CAC Spend','Net Cash Flow','Cumulative Cash'];
   const lines = [headers.join(','), ...rows.map(r => [
-    'M'+r.m, r.users, r.paid, r.collMRR, r.tradMRR, r.mrr, r.cash,
-    params.monthlyCosts, r.mrr - params.monthlyCosts
+    'M'+r.m, r.users, r.paid, r.paidMonthly, r.paidAnnual,
+    r.collMRR, r.tradMRR, r.mrr, r.newMRR, r.churnedMRR,
+    r.cash, r.dr, params.monthlyCosts, r.cacSpend, r.netCash, r.cumCash
   ].join(','))];
   const blob = new Blob([lines.join('\n')], {type:'text/csv'});
   const url = URL.createObjectURL(blob);
